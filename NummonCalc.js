@@ -474,27 +474,34 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
     },
 
     getApocryphaProgress: function() {
-        if (this.game.religion.transcendenceTier >= 354)
+        var religion = this.game.religion;
+        if (religion.transcendenceTier >= 354)
             return this.i18n("best.none");
-        var tier = this.game.religion.transcendenceTier + 1; //超越等级+1
-        var tt = this.game.religion._getTranscendTotalPrice(tier) - game.religion._getTranscendTotalPrice(tier - 1); //下一级超越等级所需要的的顿悟量
-        var obelisk = this.game.religion.getTU("blackObelisk").val; //尖碑数量
-        var obeliskRatio = (tier * 5 * obelisk + 1000) / (this.game.religion.transcendenceTier * 5 * obelisk + 1000); //尖碑带来的系数
-        var adoreIncreaceRatio = Math.pow((tier + 1) / (tier), 2); //超越等级提升带来的系数
-        var needpercent = adoreIncreaceRatio * obeliskRatio;
-        var x = tt;
+        var tier = religion.transcendenceTier;
+        var epiphanyCost = religion._getTranscendTotalPrice(tier + 1) - religion._getTranscendTotalPrice(tier);
+        var obelisk = religion.getTU("blackObelisk").val;
+        // (obeliskRatio - 1) is the percentage increase in the Solar Revolution cap
+        var obeliskRatio = ((tier+1) * 5 * obelisk + 1000) / (tier * 5 * obelisk + 1000);
+        // The increase in the adoration bonus from transcending
+        var adoreIncreaseRatio = Math.pow((tier + 2) / (tier + 1), 2);
+        var needpercent = adoreIncreaseRatio * obeliskRatio;
+        var x = epiphanyCost;
         var k = needpercent;
-        var epiphanyRecommend = (1 - k + Math.sqrt(80 * (k * k - 1) * x + (k - 1) * (k - 1))) * k / (40 * (k + 1) * (k + 1) *
-            (k - 1)) + x + x / (k * k - 1); //推荐下一超越等级的顿悟量
-        var percent = epiphanyRecommend / tt * 100; //转化成百分比形式
+        var epiphanyRecommend = 
+              (1 - k + Math.sqrt(80 * (k * k - 1) * x + (k - 1)**2))
+            * k / (40 * (k + 1) ** 2 * (k - 1))
+            + x + x / (k * k - 1);
+        var percent = epiphanyRecommend / epiphanyCost * 100;
         percent = Math.round(percent * 1000) / 1000;
+
         return percent + "%";
     },
 
     getNextTranscendTierProgress: function(){
-        var tier = this.game.religion.transcendenceTier + 1;
-        var tt = this.game.religion._getTranscendTotalPrice(tier) - game.religion._getTranscendTotalPrice(tier - 1);
-        var perc = this.game.religion.faithRatio / tt * 100;
+        var religion = this.game.religion; 
+        var tier = religion.transcendenceTier;
+        var epiphanyCost = religion._getTranscendTotalPrice(tier + 1) - religion._getTranscendTotalPrice(tier);
+        var perc = religion.faithRatio / epiphanyCost * 100;
         perc = Math.round(perc * 1000) / 1000;
         return perc + "%";
     },
