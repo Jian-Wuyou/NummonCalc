@@ -14,7 +14,8 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
             "getCelestialPerDay": "Chance of Celestial Events",
             "getCelestialAutoSuccess": "Celestial Event Auto Success Rate",
-            "getMaxComped": "Maximum Helpful Compediums",
+            "avgStarchartsFromCelestial" : "Avg. starcharts/sec from Celestial Event",
+            "getMaxCompendiums": "Maximum Helpful Compendiums",
             "getBlueprintCraft": "Blueprints Per Craft",
 
             "titanium": "Titanium",
@@ -35,7 +36,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
             "getReligionProductionBonusCap": "Solar Revolution Limit (%)",
             "getNextTranscendTierProgress": "Progress to Next Transcendence Tier",
-            "getApocryphaProgress": "Rec.Progress to Transcend Tier Progress",
+            "getApocryphaProgress": "Rec. Progress to Next Transcendence Tier",
             
             "paragon": "Paragon Bonus",
 
@@ -73,7 +74,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
             "getCelestialPerDay": "天文事件几率",
             "getCelestialAutoSuccess": "天文事件自动观测几率",
-            "getMaxComped": "最大加成所需概要数量",
+            "getMaxCompendiums": "最大加成所需概要数量",
             "getBlueprintCraft": "每次工艺制作的蓝图",
 
             "titanium": "钛",
@@ -249,15 +250,38 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
     },
     
     getCelestialAutoSuccess: function(){
-        var autoChance = this.game.getEffect("starAutoSuccessChance") * 100;
-        if(this.game.prestige.getPerk("astromancy").researched)
+        if (game.workshop.get("seti").researched)
+            return "100%";
+        var autoChance = game.getEffect("starAutoSuccessChance") * 100;
+        if(game.prestige.getPerk("astromancy").researched)
             autoChance *= 2;
         if(autoChance > 100)
             autoChance = 100;
         return autoChance + "%";
     },
+
+    avgStarchartsFromCelestial: function() {
+        var chanceRatio = 1;
+        if(game.prestige.getPerk("chronomancy").researched)
+            chanceRatio *= 1.1;
+        chanceRatio *= 1 + game.getEffect("timeRatio") * 0.25;
         
-    getMaxComped: function(){
+        var chance = 0.0025;
+        chance += game.getEffect("starEventChance");
+        chance *= chanceRatio;
+        if(game.prestige.getPerk("astromancy").researched)
+            chance *= 2;
+
+        var autoChance = game.getEffect("starAutoSuccessChance");
+        if(game.prestige.getPerk("astromancy").researched)
+            autoChance *= 2;
+        if(autoChance > 1 || game.workshop.get("seti").researched)
+            autoChance = 1;
+        
+        return chance * autoChance / 2;
+    },
+        
+    getMaxCompendiums: function(){
         var scienceBldMax = this.game.bld.getEffect("scienceMax");
         var compCap = this.game.bld.getEffect("scienceMaxCompendia");
         
@@ -686,8 +710,8 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
                 val: 0,
             },
             {
-                name: "getMaxComped",
-                // title: "Maximum Helpful Compediums",
+                name: "getMaxCompendiums",
+                // title: "Maximum Helpful Compendiums",
                 val: 0,
             },
             {
