@@ -74,6 +74,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
             "getCelestialPerDay": "天文事件几率",
             "getCelestialAutoSuccess": "天文事件自动观测几率",
+            "avgStarchartsFromCelestial" : "avgStarchartsFromCelestial",
             "getMaxCompendiums": "最大加成所需概要数量",
             "getBlueprintCraft": "每次工艺制作的蓝图",
 
@@ -707,6 +708,10 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
             {
                 name: "getCelestialAutoSuccess",
                 // title: "Celestial Event Auto Success Rate",
+                val: 0,
+            },
+            {
+                name: "avgStarchartsFromCelestial",
                 val: 0,
             },
             {
